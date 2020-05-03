@@ -1,0 +1,17 @@
+{
+  "name": "multi-threading-read-write-lock",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "//1": "--------------------------- Dev -----------------------------------------",
+    "run_build": "clear && cargo run",
+    "start": "nodemon --watch src --ext rs --exec 'npm run run_build'"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "npm-run-all": "^4.1.5"
+  }
+}
