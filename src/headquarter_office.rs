@@ -1,5 +1,6 @@
-use crate::branch::{BalanceRefreshEvent, Branch};
+use crate::branch::Branch;
 use crate::charity_account::InternationalCharityAccount;
+use crate::events::{BalanceRefreshEvent, DonationEvent, SyncingEventType};
 use std::{
     sync::{
         mpsc::{channel, Receiver, Sender},
@@ -20,10 +21,11 @@ pub struct HeadquarterOffice {}
 ///
 impl HeadquarterOffice {
     ///
-    pub fn sync_balance_from_all_branches(all_branches: Vec<Branch>) {
-        // Event channel
-        let (sender, receiver) = channel();
-
+    pub fn sync_balance_from_all_branches(
+        all_branches: Vec<Branch>,
+        sender: Sender<SyncingEventType>,
+        event_bus: Receiver<SyncingEventType>,
+    ) {
         // Branch content to render on big screen
         let mut branch_render_contents: Vec<BranchDisplayContent> = Vec::new();
 
@@ -50,25 +52,40 @@ impl HeadquarterOffice {
 
         // Here is the main loop for `HeadquarterOffice` event bus:
         // Every time we got an event, re-render all branch contents on big screen.
-        while let Ok(event) = receiver.recv() {
+        let mut donation_desc = "".to_string();
+        while let Ok(event) = event_bus.recv() {
             // thread::sleep(Duration::from_secs(1));
 
             // Clean console content
             print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
             // println!("event: {:?}", event);
 
-            // Update the particular branch render content
-            for temp_branch_content in branch_render_contents.iter_mut() {
-                if event.branch_name == temp_branch_content.branch_name {
-                    temp_branch_content.display_content = event.display_content.clone();
-                    break;
+            match event {
+                SyncingEventType::BranchBalanceUpdate(balanceRefreshEvent) => {
+                    // Update the particular branch render content
+                    for temp_branch_content in branch_render_contents.iter_mut() {
+                        if balanceRefreshEvent.branch_name == temp_branch_content.branch_name {
+                            temp_branch_content.display_content =
+                                balanceRefreshEvent.display_content.clone();
+                            break;
+                        }
+                    }
+                }
+                SyncingEventType::DonationUpdate(donationEvent) => {
+                    donation_desc = format!(
+                        "{} is making donation: {}",
+                        donationEvent.donor, donationEvent.donation_amount
+                    );
+                }
+                SyncingEventType::DonationDone => {
+                    donation_desc = "".to_string();
                 }
             }
 
             // Redraw all screen contents
             let mut render_list = Vec::new();
             let title = "\nAll branches syncing result:".to_string();
-            let splitter = "-----------------------------------------".to_string();
+            let splitter = "--------------------------------------------------".to_string();
 
             render_list.push(title);
             render_list.push(splitter.clone());
@@ -79,6 +96,10 @@ impl HeadquarterOffice {
                 ));
             }
             render_list.push(splitter);
+
+            if !&donation_desc.is_empty() {
+                render_list.push(donation_desc.clone());
+            }
 
             println!("{}", render_list.join("\n"));
         }
