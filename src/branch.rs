@@ -1,5 +1,6 @@
 use crate::charity_account::{AccountLock, InternationalCharityAccount};
 use crate::events::{BalanceRefreshEvent, SyncingEventType};
+use separator::Separatable;
 use std::{
     sync::{mpsc::Sender, Arc, RwLock},
     thread,
@@ -42,7 +43,7 @@ impl Branch {
             let display_content = if latest_balance == -1 {
                 "BAL: donation is happening ...".to_string()
             } else {
-                format!("BAL: {}", latest_balance)
+                format!("BAL: ${}", (latest_balance as usize).separated_string())
             };
 
             // Send event

@@ -35,6 +35,4 @@ fn main() {
         sender,
         event_bus,
     );
-
-    println!("Done");
 }

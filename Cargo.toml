@@ -9,3 +9,5 @@ edition = "2018"
 [dependencies]
 rand = "0.7.3"
 names = "0.11.0"
+colored = "1.9"
+separator = "0.4.1"

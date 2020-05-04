@@ -1,6 +1,7 @@
 use crate::branch::Branch;
 use crate::charity_account::InternationalCharityAccount;
 use crate::events::{BalanceRefreshEvent, DonationEvent, SyncingEventType};
+use colored::*;
 use std::{
     sync::{
         mpsc::{channel, Receiver, Sender},
@@ -83,25 +84,26 @@ impl HeadquarterOffice {
             }
 
             // Redraw all screen contents
-            let mut render_list = Vec::new();
-            let title = "\nAll branches syncing result:".to_string();
-            let splitter = "--------------------------------------------------".to_string();
+            let title = "\nAll branches syncing result:".to_string().cyan().bold();
+            let splitter = "--------------------------------------------------"
+                .to_string()
+                .white();
 
-            render_list.push(title);
-            render_list.push(splitter.clone());
+            println!("{}", title);
+            println!("{}", splitter.clone());
+
             for temp_branch_content in branch_render_contents.iter_mut() {
-                render_list.push(format!(
+                println!(
                     "{}\t|   {}",
-                    &temp_branch_content.branch_name, &temp_branch_content.display_content
-                ));
+                    &temp_branch_content.branch_name.magenta(), &temp_branch_content.display_content.green().bold()
+                );
             }
-            render_list.push(splitter);
+
+            println!("{}", splitter);
 
             if !&donation_desc.is_empty() {
-                render_list.push(donation_desc.clone());
+                println!("{}", donation_desc.clone().yellow().italic());
             }
-
-            println!("{}", render_list.join("\n"));
         }
     }
 }
