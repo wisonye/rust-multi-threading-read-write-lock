@@ -42,4 +42,14 @@ It's a very typical `atomic operation` scene, so how do we simulate the real-wor
 
     _We need concurrent share readers to read the same piece of data (account balance) at the same time, but only single exclusive writer can change the data. Also, during the time of data changing, all readers need to wait until it finishes. That's what `std::sync::RwLock` offers us._
 
+</br>
+<hr>
+
+## Running screenshots
+
+![image](https://github.com/wisonye/rust-multi-threading-read-write-lock/blob/master/screen-shot-1.png)
+
+</br>
+
+![image](https://github.com/wisonye/rust-multi-threading-read-write-lock/blob/master/screen-shot-2.png)
 
